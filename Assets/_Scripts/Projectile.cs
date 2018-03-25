@@ -48,4 +48,18 @@ public class Projectile : MonoBehaviour {
         m_v3Speed = Vector3.Lerp(m_v3Speed, newSpeed, .5f);
         transform.position += (m_v3Speed * Time.deltaTime);
 	}
+    void OnTriggerEnter(Collider c)
+    {
+        Debug.Log(c.transform.tag);
+        if (IsPlayerProjectile && c.transform.tag == "Enemy")
+        {
+            c.transform.GetComponent<Enemy>().GetDamaged();
+            Destroy(gameObject);
+        }
+        if (IsPlayerProjectile == false && c.transform.tag == "PlayerCollider")
+        {
+            c.transform.parent.GetComponent<Player>().GetDamaged();
+            Destroy(gameObject);
+        }
+    }
 }

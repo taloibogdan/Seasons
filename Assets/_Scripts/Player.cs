@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour {
 
@@ -8,10 +9,18 @@ public class Player : MonoBehaviour {
     public float JumpForce = 4000;
     public float JumpTime = 1.5f;
     public float JumpExtensionForce = 200;
+    public int MaxHP = 3;
+    public int HP = 3;
+
+    private float m_fInvincibilityCooldownMax = 1;
+    private float m_fInvincibilityCooldown = -1;
+    private float m_fInvinciBlinkLong = 0.2f;
+    private float m_fInvinciBlinkShort = 0.1f;
 
     private float m_fProjectileCooldownMax = 2;
     private float m_fProjectileCooldown = -1;
 
+    private Renderer m_renderer;
     private Rigidbody m_rigidbody;
     private float m_fJumpStartTime = 0;
     private int m_nJumpCharges = 0;
@@ -21,6 +30,7 @@ public class Player : MonoBehaviour {
     private ResourceManager m_resourceManager;
 
     void Start() {
+        m_renderer = transform.GetComponent<Renderer>();
         m_rigidbody = transform.GetComponent<Rigidbody>();
         m_gameManager = GameManager.GetInstance();
         m_gameManager.GameRunning = true;
@@ -29,7 +39,11 @@ public class Player : MonoBehaviour {
     
     void Update() {
         //MOVEMENT
-        if (m_gameManager.GameRunning == false) m_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        if (m_gameManager.GameRunning == false)
+        {
+            m_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            return;
+        }
         else m_rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
         m_rigidbody.AddForce(new Vector3((Input.GetAxis("Horizontal") - (m_rigidbody.velocity.x / 4)) * Time.deltaTime * ForceMultiplier, 0, 0));
 
@@ -66,6 +80,21 @@ public class Player : MonoBehaviour {
                 proj.SetTarget(hit.point);
             }
         }
+
+        //DMG INVINCIBILITY
+        if (m_fInvincibilityCooldown > 0)
+        {
+            m_fInvincibilityCooldown -= Time.deltaTime;
+            if(m_fInvincibilityCooldown%(m_fInvinciBlinkLong+m_fInvinciBlinkShort) > m_fInvinciBlinkLong)
+            {
+                m_renderer.enabled = false;
+            }
+            else
+            {
+                m_renderer.enabled = true;
+            }
+
+        }
     }
 
     bool IsGrounded()
@@ -76,6 +105,29 @@ public class Player : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
         
+    }
+    public void GetDamaged()
+    {
+        if(m_fInvincibilityCooldown > 0)
+        {
+            return;
+        }
+        m_fInvincibilityCooldown = m_fInvincibilityCooldownMax;
+        HP--;
+        if(HP <= 0)
+        {
+            Die();
+        }
+    }
+    public void Die()
+    {
+        m_gameManager.GameRunning = false;
+        Invoke("RestartLvl", 2);
+    }
+    public void RestartLvl()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Destroy(gameObject);
     }
 }
 
