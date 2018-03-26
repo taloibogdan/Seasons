@@ -20,6 +20,11 @@ public class Player : MonoBehaviour {
     private float m_fProjectileCooldownMax = 2;
     private float m_fProjectileCooldown = -1;
 
+    private float HarpoonCooldownMax = 1;
+    private float HarpoonCooldown = -1;
+    private float HarpoonSpeed = 10;
+    private Transform HarpoonTarget = null;
+
     private Renderer m_renderer;
     private Rigidbody m_rigidbody;
     private float m_fJumpStartTime = 0;
@@ -36,8 +41,9 @@ public class Player : MonoBehaviour {
         m_gameManager.GameRunning = true;
         m_resourceManager = ResourceManager.GetInstance();
     }
-    
-    void Update() {
+
+    void Update()
+    {
         //MOVEMENT
         if (m_gameManager.GameRunning == false)
         {
@@ -64,15 +70,15 @@ public class Player : MonoBehaviour {
         }
 
         //PROJECTILES
-        if(m_fProjectileCooldown > 0)
+        if (m_fProjectileCooldown > 0)
         {
             m_fProjectileCooldown -= Time.deltaTime;
         }
-        if(Input.GetMouseButtonDown(0) && m_fProjectileCooldown < 0)
+        if (Input.GetMouseButtonDown(0) && m_fProjectileCooldown < 0)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z*2,1<<8))
+            if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 8))
             {
                 m_fProjectileCooldown = m_fProjectileCooldownMax;
                 Debug.Log(hit.point);
@@ -85,7 +91,7 @@ public class Player : MonoBehaviour {
         if (m_fInvincibilityCooldown > 0)
         {
             m_fInvincibilityCooldown -= Time.deltaTime;
-            if(m_fInvincibilityCooldown%(m_fInvinciBlinkLong+m_fInvinciBlinkShort) > m_fInvinciBlinkLong)
+            if (m_fInvincibilityCooldown % (m_fInvinciBlinkLong + m_fInvinciBlinkShort) > m_fInvinciBlinkLong)
             {
                 m_renderer.enabled = false;
             }
@@ -94,6 +100,41 @@ public class Player : MonoBehaviour {
                 m_renderer.enabled = true;
             }
 
+        }
+
+        //STRING
+        if (HarpoonCooldown > 0)
+        {
+            HarpoonCooldown -= Time.deltaTime;
+        }
+        if (Input.GetMouseButtonDown(1) && HarpoonCooldown < 0)
+        {
+            m_rigidbody.useGravity = false;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 9))
+            {
+                HarpoonCooldown = HarpoonCooldownMax;
+                Debug.Log(hit.transform.tag);
+                HarpoonTarget = hit.transform;
+            }
+        }
+        if (Input.GetMouseButton(1) && HarpoonTarget != null)
+        {
+            float step = HarpoonSpeed * Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, HarpoonTarget.position, step);
+            Debug.DrawRay(transform.position, HarpoonTarget.position - transform.position, Color.white);
+            Debug.Log(transform.position);
+            if(Vector3.Distance(transform.position, HarpoonTarget.position) < 1)
+            {
+                HarpoonTarget = null;
+                m_rigidbody.useGravity = true;
+            }
+        }
+        if (Input.GetMouseButtonUp(1))
+        {
+            HarpoonTarget = null;
+            m_rigidbody.useGravity = true;
         }
     }
 

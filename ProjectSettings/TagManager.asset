@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Projectile
   - PlayerCollider
+  - Platform
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - 
   - 
   - ClickWall
-  - 
+  - Platform Layer
   - 
   - 
   - 
