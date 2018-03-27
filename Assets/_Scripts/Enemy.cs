@@ -77,7 +77,7 @@ public class Enemy : MonoBehaviour {
     }
     void OnTriggerStay(Collider c)
     {
-        if(c.transform.tag.Equals("Player"))
+        if (c.transform.tag.Equals("PlayerCollider"))
         {
             c.transform.parent.GetComponent<Player>().GetDamaged();
         }
