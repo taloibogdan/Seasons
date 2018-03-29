@@ -20,10 +20,11 @@ public class Player : MonoBehaviour {
     private float m_fProjectileCooldownMax = 2;
     private float m_fProjectileCooldown = -1;
 
-    private float HarpoonCooldownMax = 1;
-    private float HarpoonCooldown = -1;
-    private float HarpoonSpeed = 10;
-    private Transform HarpoonTarget = null;
+    private float HookCooldownMax = 1;
+    private float HookCooldown = -1;
+    private float HookSpeed = 10;
+    private bool HookIsActive = false;
+    private Vector3 HookCollisionPoint;
 
     private Renderer m_renderer;
     private Rigidbody m_rigidbody;
@@ -102,38 +103,43 @@ public class Player : MonoBehaviour {
 
         }
 
-        //STRING
-        if (HarpoonCooldown > 0)
+        //HOOK
+        if (HookCooldown > 0)
         {
-            HarpoonCooldown -= Time.deltaTime;
+            HookCooldown -= Time.deltaTime;
         }
-        if (Input.GetMouseButtonDown(1) && HarpoonCooldown < 0)
+        if (Input.GetMouseButtonDown(1) && HookCooldown < 0)
         {
-            m_rigidbody.useGravity = false;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 9))
             {
-                HarpoonCooldown = HarpoonCooldownMax;
-                Debug.Log(hit.transform.tag);
-                HarpoonTarget = hit.transform;
+                if(hit.transform.tag.Equals("Platform"))
+                {
+                    Debug.Log(hit.point);
+                    m_rigidbody.useGravity = false;
+                    HookCooldown = HookCooldownMax;
+                    HookIsActive = true;
+                    HookCollisionPoint = hit.point;
+                    //HookTarget = hit.transform;
+                }
             }
         }
-        if (Input.GetMouseButton(1) && HarpoonTarget != null)
+        if (Input.GetMouseButton(1) && HookIsActive)
         {
-            float step = HarpoonSpeed * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, HarpoonTarget.position, step);
-            Debug.DrawRay(transform.position, HarpoonTarget.position - transform.position, Color.white);
-            Debug.Log(transform.position);
-            if(Vector3.Distance(transform.position, HarpoonTarget.position) < 1)
+            float step = HookSpeed * Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, HookCollisionPoint, step);
+            //Debug.DrawRay(transform.position, HookCollisionPoint, Color.white);
+            if(Vector3.Distance(transform.position, HookCollisionPoint) < 1)
             {
-                HarpoonTarget = null;
+                HookIsActive = false;
                 m_rigidbody.useGravity = true;
             }
         }
         if (Input.GetMouseButtonUp(1))
         {
-            HarpoonTarget = null;
+            //HookTarget = null;
+            HookIsActive = false;
             m_rigidbody.useGravity = true;
         }
     }
