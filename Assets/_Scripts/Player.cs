@@ -10,7 +10,15 @@ public class Player : MonoBehaviour {
     public float JumpTime = 1.5f;
     public float JumpExtensionForce = 200;
     public int MaxHP = 3;
-    public int HP = 3;
+	public int HP = 3;
+
+	// DASH
+	public float dashBoost = 20f;
+	public float sinusUnits = 20f;
+	public float sinusMaxDegrees = 180f;
+	private bool isDashing = false;
+	private float incrementalDegreesSinus = 0f;
+	// DASH
 
     private float m_fInvincibilityCooldownMax = 1;
     private float m_fInvincibilityCooldown = -1;
@@ -143,6 +151,30 @@ public class Player : MonoBehaviour {
             m_rigidbody.useGravity = true;
         }
     }
+
+	void FixedUpdate()
+	{
+		float moveHorizontal = Input.GetAxis("Horizontal");
+		Vector3 movement = new Vector3(moveHorizontal, 0.0f, 0.0f);
+
+		if (isDashing) 
+		{
+			incrementalDegreesSinus += sinusUnits;
+			float cornerAngle = incrementalDegreesSinus * Mathf.PI / 180f;
+
+			m_rigidbody.AddForce(movement * dashBoost * Mathf.Sin(cornerAngle), ForceMode.Impulse);
+
+			if (incrementalDegreesSinus >= sinusMaxDegrees) {
+				isDashing = false;
+				incrementalDegreesSinus = 0f;
+			}
+		}
+
+		if (Input.GetKeyDown (KeyCode.LeftShift)) {
+			incrementalDegreesSinus = 0f;
+			isDashing = true;
+		}
+	}
 
     bool IsGrounded()
     {
