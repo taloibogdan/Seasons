@@ -9,6 +9,7 @@ TagManager:
   - Projectile
   - PlayerCollider
   - Platform
+  - Trap
   layers:
   - Default
   - TransparentFX
