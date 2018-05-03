@@ -82,7 +82,7 @@ public class Player : MonoBehaviour {
             if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 8))
             {
                 m_fProjectileCooldown = m_fProjectileCooldownMax;
-                Debug.Log(hit.point);
+                //Debug.Log(hit.point);
                 Projectile proj = Instantiate(m_resourceManager.PlayerProjectile, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Projectile>();
                 proj.SetTarget(hit.point);
             }
@@ -116,7 +116,7 @@ public class Player : MonoBehaviour {
             {
                 if(hit.transform.tag.Equals("Platform"))
                 {
-                    Debug.Log(hit.point);
+                    //Debug.Log(hit.point);
                     m_rigidbody.useGravity = false;
                     HookCooldown = HookCooldownMax;
                     HookIsActive = true;
@@ -149,10 +149,6 @@ public class Player : MonoBehaviour {
         return Physics.Raycast(transform.position, -Vector3.up, transform.localScale.y / 2.0f + 0.01f);
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        
-    }
     public void GetDamaged()
     {
         if(m_fInvincibilityCooldown > 0)
@@ -166,6 +162,12 @@ public class Player : MonoBehaviour {
             Die();
         }
     }
+
+    public void AddEssence(int GainedEssence)
+    {
+        m_resourceManager.AddEssence(GainedEssence);
+    }
+
     public void Die()
     {
         m_gameManager.GameRunning = false;

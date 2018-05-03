@@ -24,4 +24,17 @@ public class ResourceManager : MonoBehaviour {
     }
     #endregion
     public GameObject PlayerProjectile;
+
+    private int Essence = 0;
+
+    public void AddEssence(int GainedEssence)
+    {
+        Essence += GainedEssence;
+        Debug.Log("Essence: " + Essence);
+    }
+
+    public int GetEssence()
+    {
+        return Essence;
+    }
 }

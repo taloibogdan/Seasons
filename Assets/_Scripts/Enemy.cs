@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour {
     public float Range = 3;
     public bool IsFlying = false;
     public bool IsRanged = false;
+    public GameObject Drop;
 
     private float m_fInvincibilityCooldownMax = 1;
     private float m_fInvincibilityCooldown = -1;
@@ -73,6 +74,8 @@ public class Enemy : MonoBehaviour {
 
     public void Die()
     {
+        Instantiate(Drop, transform.position, new Quaternion(0, 0, 0, 0));
+        Drop.GetComponent<Essence>().SetEnemyTag(transform.tag);
         Destroy(gameObject);
     }
     void OnTriggerStay(Collider c)

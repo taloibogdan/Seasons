@@ -50,7 +50,7 @@ public class Projectile : MonoBehaviour {
 	}
     void OnTriggerEnter(Collider c)
     {
-        Debug.Log(c.transform.tag);
+        //Debug.Log(c.transform.tag);
         if (IsPlayerProjectile && c.transform.tag == "Enemy")
         {
             c.transform.GetComponent<Enemy>().GetDamaged();
