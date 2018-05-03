@@ -119,6 +119,7 @@ public class Player : MonoBehaviour {
         {
             m_fHookCooldown -= Time.deltaTime;
         }
+        if (Input.GetMouseButtonDown(1) && m_fHookCooldown < 0 && !m_isHookActive)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
