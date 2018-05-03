@@ -61,5 +61,9 @@ public class Projectile : MonoBehaviour {
             c.transform.parent.GetComponent<Player>().GetDamaged();
             Destroy(gameObject);
         }
+        if(c.transform.tag != "Enemy" && !c.transform.tag.Contains("Player") && c.gameObject.layer != 8)
+        {
+            Destroy(gameObject);
+        }
     }
 }

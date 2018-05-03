@@ -10,7 +10,15 @@ public class Player : MonoBehaviour {
     public float JumpTime = 1.5f;
     public float JumpExtensionForce = 200;
     public int MaxHP = 3;
-    public int HP = 3;
+	public int HP = 3;
+
+	// DASH
+	public float dashBoost = 20f;
+	public float sinusUnits = 20f;
+	public float sinusMaxDegrees = 180f;
+	private bool isDashing = false;
+	private float incrementalDegreesSinus = 0f;
+	// DASH
 
     private float m_fInvincibilityCooldownMax = 1;
     private float m_fInvincibilityCooldown = -1;
@@ -20,11 +28,14 @@ public class Player : MonoBehaviour {
     private float m_fProjectileCooldownMax = 2;
     private float m_fProjectileCooldown = -1;
 
-    private float HookCooldownMax = 1;
-    private float HookCooldown = -1;
-    private float HookSpeed = 10;
-    private bool HookIsActive = false;
-    private Vector3 HookCollisionPoint;
+    public float HookCooldownMax = 1;
+    public float HookHeadSpeed = 10;
+    public float HookSpeed = 4;
+    public float HookLength = 6;
+    private float m_fHookCooldown = -1;
+    private Hook m_hook = null;
+    private bool m_isHookActive = false;
+    private Vector3 m_vHookCollisionPoint;
 
     private Renderer m_renderer;
     private Rigidbody m_rigidbody;
@@ -104,49 +115,94 @@ public class Player : MonoBehaviour {
         }
 
         //HOOK
-        if (HookCooldown > 0)
+        if (m_fHookCooldown > 0)
         {
-            HookCooldown -= Time.deltaTime;
+            m_fHookCooldown -= Time.deltaTime;
         }
-        if (Input.GetMouseButtonDown(1) && HookCooldown < 0)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 9))
+            if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 8))
             {
                 if(hit.transform.tag.Equals("Platform"))
                 {
-                    //Debug.Log(hit.point);
-                    m_rigidbody.useGravity = false;
-                    HookCooldown = HookCooldownMax;
-                    HookIsActive = true;
-                    HookCollisionPoint = hit.point;
-                    //HookTarget = hit.transform;
+                    Debug.Log(hit.point);
+                    m_hook = Instantiate(m_resourceManager.Hook, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Hook>();
+                    m_hook.Init((hit.point - transform.position).normalized * HookHeadSpeed, HookLength);
+                    m_fHookCooldown = 99999;
                 }
             }
         }
-        if (Input.GetMouseButton(1) && HookIsActive)
+        if (Input.GetMouseButton(1) && m_isHookActive)
         {
             float step = HookSpeed * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, HookCollisionPoint, step);
-            //Debug.DrawRay(transform.position, HookCollisionPoint, Color.white);
-            if(Vector3.Distance(transform.position, HookCollisionPoint) < 1)
+            transform.position = Vector3.MoveTowards(transform.position, m_vHookCollisionPoint, step);
+            if(Vector3.Distance(transform.position, m_vHookCollisionPoint) < .5)
             {
-                HookIsActive = false;
-                m_rigidbody.useGravity = true;
+                m_isHookActive = false;
             }
         }
         if (Input.GetMouseButtonUp(1))
         {
-            //HookTarget = null;
-            HookIsActive = false;
-            m_rigidbody.useGravity = true;
+            m_isHookActive = false;
+            if (m_hook != null)
+            {
+                m_hook.DestroySelf();
+            }
         }
     }
+
+    public void SetHookCollisionPoint(Vector3 pos)
+    {
+        m_rigidbody.isKinematic = true;
+        m_vHookCollisionPoint = pos;
+        m_isHookActive = true;
+    }
+
+    public void HookDestroyed()
+    {
+        m_rigidbody.isKinematic = false;
+        m_isHookActive = false;
+        m_vHookCollisionPoint = Vector3.zero;
+        m_fHookCooldown = HookCooldownMax;
+        m_hook = null;
+    }
+
+    void FixedUpdate()
+	{
+		float moveHorizontal = Input.GetAxis("Horizontal");
+		Vector3 movement = new Vector3(moveHorizontal, 0.0f, 0.0f);
+
+		if (isDashing) 
+		{
+			incrementalDegreesSinus += sinusUnits;
+			float cornerAngle = incrementalDegreesSinus * Mathf.PI / 180f;
+
+			m_rigidbody.AddForce(movement * dashBoost * Mathf.Sin(cornerAngle), ForceMode.Impulse);
+
+			if (incrementalDegreesSinus >= sinusMaxDegrees) {
+				isDashing = false;
+				incrementalDegreesSinus = 0f;
+			}
+		}
+
+		if (Input.GetKeyDown (KeyCode.LeftShift)) {
+			incrementalDegreesSinus = 0f;
+			isDashing = true;
+		}
+	}
 
     bool IsGrounded()
     {
         return Physics.Raycast(transform.position, -Vector3.up, transform.localScale.y / 2.0f + 0.01f);
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if(other.tag == "Trap")
+        {
+            GetDamaged();
+        }
     }
 
     public void GetDamaged()

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour {
+public class Enemy : MonoBehaviour
+{
     public float HP = 2;
     public float Speed = 2;
     public float Range = 3;
@@ -18,16 +19,17 @@ public class Enemy : MonoBehaviour {
     private Renderer m_renderer;
     private GameObject m_player;
     private GameManager m_gameManager;
-	void Start ()
+    void Start()
     {
         m_renderer = transform.GetComponent<Renderer>();
         m_gameManager = GameManager.GetInstance();
         m_player = m_gameManager.Player;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        if(m_gameManager.GameRunning == false)
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (m_gameManager.GameRunning == false)
         {
             return;
         }
@@ -57,7 +59,7 @@ public class Enemy : MonoBehaviour {
 
         }
     }
-    
+
     public void GetDamaged()
     {
         if (m_fInvincibilityCooldown > 0)
@@ -83,6 +85,10 @@ public class Enemy : MonoBehaviour {
         if (c.transform.tag.Equals("PlayerCollider"))
         {
             c.transform.parent.GetComponent<Player>().GetDamaged();
+        }
+        if (c.tag == "Trap")
+        {
+            GetDamaged();
         }
     }
 }

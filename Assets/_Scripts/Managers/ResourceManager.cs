@@ -24,6 +24,7 @@ public class ResourceManager : MonoBehaviour {
     }
     #endregion
     public GameObject PlayerProjectile;
+    public GameObject Hook;
 
     private int Essence = 0;
 

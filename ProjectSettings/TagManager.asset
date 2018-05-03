@@ -4,10 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Ground
-  - Enemy
+  - Trap
   - Projectile
-  - PlayerCollider
   - Platform
   - Essence
   layers:
@@ -19,8 +17,6 @@ TagManager:
   - UI
   - 
   - 
-  - ClickWall
-  - Platform Layer
   - 
   - 
   - 
