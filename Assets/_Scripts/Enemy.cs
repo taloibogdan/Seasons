@@ -16,14 +16,27 @@ public class Enemy : MonoBehaviour
     private float m_fInvinciBlinkLong = 0.2f;
     private float m_fInvinciBlinkShort = 0.1f;
 
+    private float m_fProjectileCooldownMax = 2;
+    private float m_fProjectileCooldown = -1;
+
     private Renderer m_renderer;
+    private Rigidbody m_rigidbody;
     private GameObject m_player;
     private GameManager m_gameManager;
+    private ResourceManager m_resourceManager;
+
     void Start()
     {
         m_renderer = transform.GetComponent<Renderer>();
+        m_rigidbody = transform.GetComponent<Rigidbody>();
         m_gameManager = GameManager.GetInstance();
+        m_resourceManager = ResourceManager.GetInstance();
         m_player = m_gameManager.Player;
+
+        if(IsFlying)
+        {
+            m_rigidbody.useGravity = false;
+        }
     }
 
     // Update is called once per frame
@@ -33,14 +46,35 @@ public class Enemy : MonoBehaviour
         {
             return;
         }
-        if (IsFlying == false)
+
+        Vector3 pos = m_player.transform.position;
+        float dx = pos.x - transform.position.x;
+        float sgn = dx / Mathf.Abs(dx);
+        if (dx * sgn > Speed * Time.deltaTime && Range < (pos - transform.position).magnitude)
         {
-            Vector3 pos = m_player.transform.position;
-            float dx = pos.x - transform.position.x;
-            float sgn = dx / Mathf.Abs(dx);
-            if (dx * sgn > Speed * Time.deltaTime && Range < (pos - transform.position).magnitude)
+            transform.position += new Vector3(Speed * Time.deltaTime * sgn, 0, 0);
+            if (IsFlying)
             {
-                transform.position += new Vector3(Speed * Time.deltaTime * sgn, 0, 0);
+
+            }
+        }
+
+        //PROJECTILES
+        if(IsRanged)
+        {
+            if (m_fProjectileCooldown > 0)
+            {
+                m_fProjectileCooldown -= Time.deltaTime;
+            }
+            else
+            {
+                if(Range >= (pos - transform.position).magnitude)
+                {
+                    m_fProjectileCooldown = m_fProjectileCooldownMax;
+                    //Debug.Log(hit.point);
+                    Projectile proj = Instantiate(m_resourceManager.EnemyProjectile, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Projectile>();
+                    proj.SetTarget(pos);
+                }
             }
         }
 
@@ -57,6 +91,14 @@ public class Enemy : MonoBehaviour
                 m_renderer.enabled = true;
             }
 
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (IsFlying)
+        {
+            transform.position = Vector3.Lerp(transform.position + Vector3.up/50, transform.position - Vector3.up/50, Mathf.PingPong(Time.time, 1));
         }
     }
 
