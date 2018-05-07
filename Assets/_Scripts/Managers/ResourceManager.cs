@@ -26,13 +26,19 @@ public class ResourceManager : MonoBehaviour {
     public GameObject PlayerProjectile;
     public GameObject EnemyProjectile;
     public GameObject Hook;
+	private UIManager m_uiManager;
 
     private int Essence = 0;
 
+	void Start()
+	{
+		m_uiManager = UIManager.GetInstance();
+	}
     public void AddEssence(int GainedEssence)
     {
         Essence += GainedEssence;
         Debug.Log("Essence: " + Essence);
+		m_uiManager.EssenceStats.text = "" + GetEssence();
     }
 
     public int GetEssence()

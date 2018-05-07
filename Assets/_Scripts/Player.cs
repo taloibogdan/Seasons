@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
@@ -25,7 +26,7 @@ public class Player : MonoBehaviour {
     private float m_fInvinciBlinkLong = 0.2f;
     private float m_fInvinciBlinkShort = 0.1f;
 
-    private float m_fProjectileCooldownMax = 2;
+    private float m_fProjectileCooldownMax = 3;
     private float m_fProjectileCooldown = -1;
 
     public float HookCooldownMax = 1;
@@ -45,6 +46,7 @@ public class Player : MonoBehaviour {
 
     private GameManager m_gameManager;
     private ResourceManager m_resourceManager;
+	private UIManager m_uiManager;
 
     void Start() {
         m_renderer = transform.GetComponent<Renderer>();
@@ -52,6 +54,12 @@ public class Player : MonoBehaviour {
         m_gameManager = GameManager.GetInstance();
         m_gameManager.GameRunning = true;
         m_resourceManager = ResourceManager.GetInstance();
+		m_uiManager = UIManager.GetInstance();
+
+		// UI
+		m_uiManager.ShootingCooldown.gameObject.SetActive (false);
+		m_uiManager.HealthStats.text = "" + MaxHP;
+		m_uiManager.EssenceStats.text = "" + m_resourceManager.GetEssence();
     }
 
     void Update()
@@ -82,10 +90,21 @@ public class Player : MonoBehaviour {
         }
 
         //PROJECTILES
-        if (m_fProjectileCooldown > 0)
-        {
-            m_fProjectileCooldown -= Time.deltaTime;
-        }
+		if (m_fProjectileCooldown > 0) {
+
+			m_fProjectileCooldown -= Time.deltaTime;		
+
+
+			// Shooting Cooldown
+			if (m_uiManager.ShootingCooldown.IsActive ()) {
+				m_uiManager.ShootingCooldown.GetComponentInChildren<Text> ().text = "" + (int)m_fProjectileCooldown;
+			} else {
+				m_uiManager.ShootingCooldown.gameObject.SetActive (true);
+			}
+		} else {
+			// Shooting Cooldown
+			m_uiManager.ShootingCooldown.gameObject.SetActive (false);
+		}
         if (Input.GetMouseButtonDown(0) && m_fProjectileCooldown < 0)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -125,13 +144,10 @@ public class Player : MonoBehaviour {
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 8))
             {
-                if(hit.transform.tag.Equals("Platform"))
-                {
-                    Debug.Log(hit.point);
-                    m_hook = Instantiate(m_resourceManager.Hook, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Hook>();
-                    m_hook.Init((hit.point - transform.position).normalized * HookHeadSpeed, HookLength);
-                    m_fHookCooldown = 99999;
-                }
+				Debug.Log(hit.point);
+                m_hook = Instantiate(m_resourceManager.Hook, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Hook>();
+                m_hook.Init((hit.point - transform.position).normalized * HookHeadSpeed, HookLength);
+                m_fHookCooldown = 99999;
             }
         }
         if (Input.GetMouseButton(1) && m_isHookActive)
@@ -214,6 +230,8 @@ public class Player : MonoBehaviour {
         }
         m_fInvincibilityCooldown = m_fInvincibilityCooldownMax;
         HP--;
+		// UI
+		m_uiManager.HealthStats.text = "" + HP;
         if(HP <= 0)
         {
             Die();
