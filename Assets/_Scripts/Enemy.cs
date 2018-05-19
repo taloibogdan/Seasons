@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour
     public float HP = 2;
     public float Speed = 2;
     public float Range = 3;
+    public float AggroRange = 8;
     public bool IsFlying = false;
     public bool IsRanged = false;
     public GameObject Drop;
@@ -49,6 +50,10 @@ public class Enemy : MonoBehaviour
 
         Vector3 pos = m_player.transform.position;
         float dx = pos.x - transform.position.x;
+        if (Mathf.Abs(dx) > AggroRange)
+        {
+            return;
+        }
         float sgn = dx / Mathf.Abs(dx);
         if (dx * sgn > Speed * Time.deltaTime && Range < (pos - transform.position).magnitude)
         {

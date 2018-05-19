@@ -8,6 +8,8 @@ TagManager:
   - Projectile
   - Platform
   - Essence
+  - Enemy
+  - PlayerCollider
   layers:
   - Default
   - TransparentFX
@@ -17,7 +19,9 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - ClickWall
+  - Platforms
+  - Triggers
   - 
   - 
   - 

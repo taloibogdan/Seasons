@@ -61,7 +61,6 @@ public class Player : MonoBehaviour {
 		m_uiManager.HealthStats.text = "" + MaxHP;
 		m_uiManager.EssenceStats.text = "" + m_resourceManager.GetEssence();
     }
-
     void Update()
     {
         //MOVEMENT
@@ -70,7 +69,7 @@ public class Player : MonoBehaviour {
             m_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
             return;
         }
-        else m_rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
+        else m_rigidbody.constraints = RigidbodyConstraints.FreezePositionZ|RigidbodyConstraints.FreezeRotation;
         m_rigidbody.AddForce(new Vector3((Input.GetAxis("Horizontal") - (m_rigidbody.velocity.x / 4)) * Time.deltaTime * ForceMultiplier, 0, 0));
 
         if (IsGrounded()) m_nJumpCharges = m_nMaxJumpCharges;
