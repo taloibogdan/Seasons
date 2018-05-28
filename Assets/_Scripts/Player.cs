@@ -29,6 +29,10 @@ public class Player : MonoBehaviour {
     private float m_fProjectileCooldownMax = 3;
     private float m_fProjectileCooldown = -1;
 
+    private float m_fSlowFactor = 1.0f;
+    private float m_fSlowTime = 10;
+    private float m_fSlowTimeMax = 5;
+
     public float HookCooldownMax = 1;
     public float HookHeadSpeed = 10;
     public float HookSpeed = 4;
@@ -40,6 +44,7 @@ public class Player : MonoBehaviour {
 
     private Renderer m_renderer;
     private Rigidbody m_rigidbody;
+    private ParticleSystem m_slowParticles;
     private float m_fJumpStartTime = 0;
     private int m_nJumpCharges = 0;
     private int m_nMaxJumpCharges = 2;
@@ -51,6 +56,8 @@ public class Player : MonoBehaviour {
     void Start() {
         m_renderer = transform.GetComponent<Renderer>();
         m_rigidbody = transform.GetComponent<Rigidbody>();
+        m_slowParticles = transform.GetComponentInChildren<ParticleSystem>();
+        m_slowParticles.Stop();
         m_gameManager = GameManager.GetInstance();
         m_gameManager.GameRunning = true;
         m_resourceManager = ResourceManager.GetInstance();
@@ -70,7 +77,7 @@ public class Player : MonoBehaviour {
             return;
         }
         else m_rigidbody.constraints = RigidbodyConstraints.FreezePositionZ|RigidbodyConstraints.FreezeRotation;
-        m_rigidbody.AddForce(new Vector3((Input.GetAxis("Horizontal") - (m_rigidbody.velocity.x / 4)) * Time.deltaTime * ForceMultiplier, 0, 0));
+        m_rigidbody.AddForce(new Vector3((Input.GetAxis("Horizontal") - (m_rigidbody.velocity.x / 4)) * Time.deltaTime * ForceMultiplier * m_fSlowFactor, 0, 0));
 
         if (IsGrounded()) m_nJumpCharges = m_nMaxJumpCharges;
         if (Input.GetKeyDown(KeyCode.Space))
@@ -79,13 +86,26 @@ public class Player : MonoBehaviour {
             {
                 --m_nJumpCharges;
                 m_rigidbody.velocity = new Vector3(m_rigidbody.velocity.x, 0, 0);
-                m_rigidbody.AddForce(new Vector3(0, JumpForce, 0));
+                m_rigidbody.AddForce(new Vector3(0, JumpForce * m_fSlowFactor, 0));
                 m_fJumpStartTime = Time.time;
             }
         }
         if (Input.GetKey(KeyCode.Space) && Time.time - m_fJumpStartTime < JumpTime)
         {
-            m_rigidbody.AddForce(new Vector3(0, (JumpTime - (Time.time - m_fJumpStartTime)) * Time.deltaTime * JumpExtensionForce, 0));
+            m_rigidbody.AddForce(new Vector3(0, (JumpTime - (Time.time - m_fJumpStartTime)) * Time.deltaTime * JumpExtensionForce * m_fSlowFactor, 0));
+        }
+
+        //SLOW EFFECT
+        if(m_fSlowTime < m_fSlowTimeMax)
+        {
+            m_fSlowTime += Time.deltaTime;
+
+            if(m_fSlowTime >= m_fSlowTimeMax)
+            {
+                Debug.Log("Stop slow");
+                m_fSlowFactor = 1.0f;
+                m_slowParticles.Stop();
+            }
         }
 
         //PROJECTILES
@@ -194,7 +214,7 @@ public class Player : MonoBehaviour {
 			incrementalDegreesSinus += sinusUnits;
 			float cornerAngle = incrementalDegreesSinus * Mathf.PI / 180f;
 
-			m_rigidbody.AddForce(movement * dashBoost * Mathf.Sin(cornerAngle), ForceMode.Impulse);
+			m_rigidbody.AddForce(movement * dashBoost * Mathf.Sin(cornerAngle) * m_fSlowFactor, ForceMode.Impulse);
 
 			if (incrementalDegreesSinus >= sinusMaxDegrees) {
 				isDashing = false;
@@ -235,6 +255,19 @@ public class Player : MonoBehaviour {
         {
             Die();
         }
+    }
+
+    public void ApplySlowEffect()
+    {
+        if (m_fInvincibilityCooldown > 0)
+        {
+            return;
+        }
+        Debug.Log("Start slow");
+        m_fInvincibilityCooldown = m_fInvincibilityCooldownMax;
+        m_fSlowFactor = 0.7f;
+        m_fSlowTime = 0;
+        m_slowParticles.Play();
     }
 
     public void AddEssence(int GainedEssence)

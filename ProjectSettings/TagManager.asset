@@ -10,6 +10,7 @@ TagManager:
   - Essence
   - Enemy
   - PlayerCollider
+  - Boss
   layers:
   - Default
   - TransparentFX

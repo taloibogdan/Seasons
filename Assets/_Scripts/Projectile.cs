@@ -8,6 +8,8 @@ public class Projectile : MonoBehaviour {
     public float Speed = 8;
     public bool IsFollowingPlayer = false;
     public float Lifetime = 2;
+    public bool DoesDamage = true;
+    public bool HasSlow = false;
 
     private Vector3 m_v3TargetPos;
     private GameObject m_player = null;
@@ -18,6 +20,11 @@ public class Projectile : MonoBehaviour {
     {
         m_v3TargetPos = pos + (pos - transform.position).normalized * Speed * Lifetime;
         m_isStarted = true;
+    }
+
+    public void SetLifetime(float Lifetime)
+    {
+        this.Lifetime = Lifetime;
     }
 
     void Start()
@@ -56,12 +63,25 @@ public class Projectile : MonoBehaviour {
             c.transform.GetComponent<Enemy>().GetDamaged();
             Destroy(gameObject);
         }
-        if (IsPlayerProjectile == false && c.transform.tag == "PlayerCollider")
+        if (IsPlayerProjectile && c.transform.tag == "Boss")
         {
-            c.transform.parent.GetComponent<Player>().GetDamaged();
+            c.transform.GetComponent<Boss>().GetDamaged();
             Destroy(gameObject);
         }
-        if(c.transform.tag != "Enemy" && !c.transform.tag.Contains("Player") && c.gameObject.layer != 8 && c.gameObject.layer != 10)
+        if (IsPlayerProjectile == false && c.transform.tag == "PlayerCollider")
+        {
+            if (DoesDamage)
+            {
+                c.transform.parent.GetComponent<Player>().GetDamaged();
+            }
+
+            if(HasSlow)
+            {
+                c.transform.parent.GetComponent<Player>().ApplySlowEffect();
+            }
+            Destroy(gameObject);
+        }
+        if(c.transform.tag != "Enemy" && c.transform.tag != "Boss" && !c.transform.tag.Contains("Player") && c.gameObject.layer != 8 && c.gameObject.layer != 10)
         {
             Destroy(gameObject);
         }
