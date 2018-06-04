@@ -20,6 +20,8 @@ public class Enemy : MonoBehaviour
     private float m_fProjectileCooldownMax = 2;
     private float m_fProjectileCooldown = -1;
 
+    private bool m_isAggro = false;
+
     private Renderer m_renderer;
     private Rigidbody m_rigidbody;
     private GameObject m_player;
@@ -50,9 +52,13 @@ public class Enemy : MonoBehaviour
 
         Vector3 pos = m_player.transform.position;
         float dx = pos.x - transform.position.x;
-        if (Mathf.Abs(dx) > AggroRange)
+        if ((transform.position - pos).magnitude > AggroRange && m_isAggro == false)
         {
             return;
+        }
+        else
+        {
+            m_isAggro = true;
         }
         float sgn = dx / Mathf.Abs(dx);
         if (dx * sgn > Speed * Time.deltaTime && Range < (pos - transform.position).magnitude)
@@ -73,9 +79,10 @@ public class Enemy : MonoBehaviour
             }
             else
             {
-                if(Range >= (pos - transform.position).magnitude)
+                if(Range >= (pos - transform.position).magnitude && m_isAggro == true)
                 {
                     m_fProjectileCooldown = m_fProjectileCooldownMax;
+                    //Debug.Log("Shooting");
                     //Debug.Log(hit.point);
                     Projectile proj = Instantiate(m_resourceManager.EnemyProjectile, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Projectile>();
                     proj.SetTarget(pos);

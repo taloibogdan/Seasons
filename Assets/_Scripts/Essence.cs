@@ -11,6 +11,11 @@ public class Essence : MonoBehaviour {
     private bool isColliding = false;
     private Rigidbody m_rigidbody;
 
+    private float m_floatingCDmax = 1;
+    private float m_floatingCD = 0;
+    private float m_floatingDir = 1;
+    private float m_floatingSpeed = 0.5f;
+
     public void SetEnemyTag(string EnemyTag)
     {
         this.EnemyTag = EnemyTag;
@@ -43,6 +48,7 @@ public class Essence : MonoBehaviour {
 
     void Start()
     {
+        m_floatingCD = Random.value * m_floatingCDmax;
         m_rigidbody = transform.GetComponent<Rigidbody>();
     }
 
@@ -51,6 +57,16 @@ public class Essence : MonoBehaviour {
         if(IsGrounded())
         {
             m_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        }
+        if(m_rigidbody.constraints==RigidbodyConstraints.FreezeAll)
+        {
+            if(m_floatingCD < 0)
+            {
+                m_floatingCD = m_floatingCDmax;
+                m_floatingDir *= -1;
+            }
+            m_floatingCD -= Time.deltaTime;
+            transform.position += new Vector3(0, m_floatingDir * m_floatingSpeed * Time.deltaTime, 0);
         }
     }
 

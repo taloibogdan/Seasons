@@ -115,6 +115,8 @@ MonoBehaviour:
   Speed: 6
   IsFollowingPlayer: 0
   Lifetime: 1
+  DoesDamage: 1
+  HasSlow: 0
 --- !u!135 &135814901019433118
 SphereCollider:
   m_ObjectHideFlags: 1

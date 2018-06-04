@@ -98,7 +98,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 8
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!65 &65233784482476572
 BoxCollider:
@@ -126,6 +126,7 @@ MonoBehaviour:
   HP: 2
   Speed: 2
   Range: 1
+  AggroRange: 8
   IsFlying: 0
   IsRanged: 0
   Drop: {fileID: 1664147131717054, guid: a9c013005237dd84e91a06abc55a546b, type: 2}
