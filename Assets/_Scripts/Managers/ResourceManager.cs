@@ -27,6 +27,7 @@ public class ResourceManager : MonoBehaviour {
     public GameObject EnemyProjectile;
     public GameObject SlowProjectile;
     public GameObject Hook;
+    public GameObject WallRight;
 	private UIManager m_uiManager;
 
     private int Essence = 0;

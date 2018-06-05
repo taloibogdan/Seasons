@@ -235,7 +235,7 @@ public class Player : MonoBehaviour {
 
     void OnTriggerStay(Collider other)
     {
-        if(other.tag == "Trap")
+        if(other.tag == "Trap" || other.tag == "BossTrap")
         {
             GetDamaged();
         }
