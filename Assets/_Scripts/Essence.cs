@@ -28,7 +28,7 @@ public class Essence : MonoBehaviour {
         Debug.Log("Essence dropped by " + EnemyTag);
 
         //this has to be modified
-        if (EnemyTag.Equals("Enemy"))
+        if (EnemyTag.Equals("Enemy") || EnemyTag.Equals("Boss"))
         {
             Reward = new System.Random().Next(MinEssenceNormal, MaxEssenceNormal);
             Debug.Log("Reward set to " + Reward);
