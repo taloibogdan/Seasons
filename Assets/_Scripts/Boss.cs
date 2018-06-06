@@ -62,7 +62,7 @@ public class Boss : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        m_renderer = transform.GetComponent<Renderer>();
+        m_renderer = transform.GetComponentInChildren<SkinnedMeshRenderer>();
         m_rigidbody = transform.GetComponent<Rigidbody>();
         m_gameManager = GameManager.GetInstance();
         m_player = m_gameManager.Player;
@@ -92,6 +92,20 @@ public class Boss : MonoBehaviour {
 
         Vector3 pos = m_player.transform.position;
         float dx = pos.x - transform.position.x;
+
+        if(dx < 0)
+        {
+            Quaternion rot = transform.rotation;
+            rot.y = 0;
+            transform.rotation = rot;
+        }
+        if (dx > 0)
+        {
+            Quaternion rot = transform.rotation;
+            rot.y = 180;
+            transform.rotation = rot;
+        }
+
         float sgn = dx / Mathf.Abs(dx);
         if (Mathf.Abs(dx) > AggroRange)
         {
@@ -189,7 +203,7 @@ public class Boss : MonoBehaviour {
                             m_fTeleportProjectileCooldown = m_fTeleportProjectileCooldownMax;
 
                             Vector3 newPosition = m_player.transform.position;
-                            int height = new System.Random().Next(3, 10);
+                            int height = new System.Random().Next(3, 7);
                             int direction = nextLeft ? -1 : 1;
 
                             newPosition.x += direction * 3;
@@ -315,7 +329,6 @@ public class Boss : MonoBehaviour {
 
     private void resetSkillVariables()
     {
-        Debug.Log("Idle state");
         state = BossState.Idle;
 
         //projectiles
@@ -323,9 +336,11 @@ public class Boss : MonoBehaviour {
         m_fProjectileCooldown = 0;
         m_fTeleportConsecutiveShots = 0;
         m_fTeleportProjectileCooldown = 0;
+        m_fTrapsSpwan = 0;
+        m_fTrapsSpawnCooldown = 0;
 
-    //slow attack
-    Component bossHalo = GetComponent("Halo");
+        //slow attack
+        Component bossHalo = GetComponent("Halo");
         bossHalo.GetType().GetProperty("enabled").SetValue(bossHalo, false, null);
         m_fHaloCharge = 0;
     }

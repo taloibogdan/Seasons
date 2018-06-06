@@ -46,6 +46,7 @@ public class Player : MonoBehaviour {
     private bool m_isHookActive = false;
     private Vector3 m_vHookCollisionPoint;
 
+    private Vector3 playerPos;
     private Renderer m_renderer;
     private Rigidbody m_rigidbody;
     private ParticleSystem m_slowParticles;
@@ -58,7 +59,7 @@ public class Player : MonoBehaviour {
 	private UIManager m_uiManager;
 
     void Start() {
-        m_renderer = transform.GetComponent<Renderer>();
+        m_renderer = transform.GetComponentInChildren<MeshRenderer>();
         m_rigidbody = transform.GetComponent<Rigidbody>();
         m_slowParticles = transform.GetComponentInChildren<ParticleSystem>();
         m_slowParticles.Stop();
@@ -73,6 +74,8 @@ public class Player : MonoBehaviour {
 		m_uiManager.DashCooldown.gameObject.SetActive (false);
 		m_uiManager.HealthStats.text = "" + MaxHP;
 		m_uiManager.EssenceStats.text = "" + m_resourceManager.GetEssence();
+
+        playerPos = transform.position;
     }
     void Update()
     {
@@ -84,6 +87,21 @@ public class Player : MonoBehaviour {
         }
         else m_rigidbody.constraints = RigidbodyConstraints.FreezePositionZ|RigidbodyConstraints.FreezeRotation;
         m_rigidbody.AddForce(new Vector3((Input.GetAxis("Horizontal") - (m_rigidbody.velocity.x / 4)) * Time.deltaTime * ForceMultiplier * m_fSlowFactor, 0, 0));
+
+        if(transform.position.x < playerPos.x)
+        {
+            Quaternion rot = transform.rotation;
+            rot.y = 180;
+            transform.rotation = rot;
+        }
+        
+        if(transform.position.x > playerPos.x)
+        {
+            Quaternion rot = transform.rotation;
+            rot.y = 0;
+            transform.rotation = rot;
+        }
+        playerPos = transform.position;
 
         if (IsGrounded()) m_nJumpCharges = m_nMaxJumpCharges;
         if (Input.GetKeyDown(KeyCode.Space))
@@ -206,7 +224,7 @@ public class Player : MonoBehaviour {
 
 		//DASH
 		if (m_fDashCooldown > 0) {
-			Debug.Log (m_fDashCooldown);
+			//Debug.Log (m_fDashCooldown);
 			m_fDashCooldown -= Time.deltaTime;
 
 			// Shooting Cooldown
