@@ -6,19 +6,23 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
-    public float ForceMultiplier = 10000;
-    public float JumpForce = 4000;
+    public float ForceMultiplier = 3000;
+    public float JumpForce = 320;
     public float JumpTime = 1.5f;
-    public float JumpExtensionForce = 200;
+    public float JumpExtensionForce = 100;
     public int MaxHP = 3;
 	public int HP = 3;
 
 	// DASH
-	public float dashBoost = 20f;
+	public float dashBoost = 10f;
 	public float sinusUnits = 20f;
 	public float sinusMaxDegrees = 180f;
 	private bool isDashing = false;
 	private float incrementalDegreesSinus = 0f;
+	private float m_fDashCooldown = -1;
+	private float m_fDashCooldownMax = 2;
+	private int maxDashes = 2;
+	private int numberOfDashes = 0;
 	// DASH
 
     private float m_fInvincibilityCooldownMax = 1;
@@ -33,9 +37,9 @@ public class Player : MonoBehaviour {
     private float m_fSlowTime = 10;
     private float m_fSlowTimeMax = 5;
 
-    public float HookCooldownMax = 1;
-    public float HookHeadSpeed = 10;
-    public float HookSpeed = 4;
+    public float HookCooldownMax = 4;
+    public float HookHeadSpeed = 12;
+    public float HookSpeed = 6;
     public float HookLength = 6;
     private float m_fHookCooldown = -1;
     private Hook m_hook = null;
@@ -65,6 +69,8 @@ public class Player : MonoBehaviour {
 
 		// UI
 		m_uiManager.ShootingCooldown.gameObject.SetActive (false);
+		m_uiManager.HookCooldown.gameObject.SetActive (false);
+		m_uiManager.DashCooldown.gameObject.SetActive (false);
 		m_uiManager.HealthStats.text = "" + MaxHP;
 		m_uiManager.EssenceStats.text = "" + m_resourceManager.GetEssence();
     }
@@ -153,39 +159,66 @@ public class Player : MonoBehaviour {
         }
 
         //HOOK
-        if (m_fHookCooldown > 0)
-        {
-            m_fHookCooldown -= Time.deltaTime;
-        }
-        if (Input.GetMouseButtonDown(1) && m_fHookCooldown < 0 && !m_isHookActive)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 8))
-            {
-				Debug.Log(hit.point);
-                m_hook = Instantiate(m_resourceManager.Hook, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Hook>();
-                m_hook.Init((hit.point - transform.position).normalized * HookHeadSpeed, HookLength);
-                m_fHookCooldown = 99999;
-            }
-        }
-        if (Input.GetMouseButton(1) && m_isHookActive)
-        {
-            float step = HookSpeed * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, m_vHookCollisionPoint, step);
-            if(Vector3.Distance(transform.position, m_vHookCollisionPoint) < .5)
-            {
-                m_isHookActive = false;
-            }
-        }
-        if (Input.GetMouseButtonUp(1))
-        {
-            m_isHookActive = false;
-            if (m_hook != null)
-            {
-                m_hook.DestroySelf();
-            }
-        }
+		if (m_fHookCooldown > 0) {
+			m_fHookCooldown -= Time.deltaTime;
+
+			// Shooting Cooldown
+			if (m_uiManager.HookCooldown.IsActive ()) {
+				m_uiManager.HookCooldown.GetComponentInChildren<Text> ().text = "" + (int)m_fHookCooldown;
+			} else {
+				m_uiManager.HookCooldown.gameObject.SetActive (true);
+			}
+		} else {
+			// Shooting Cooldown
+			m_uiManager.HookCooldown.gameObject.SetActive (false);
+
+			if (Input.GetMouseButtonDown(1) && m_fHookCooldown < 0 && !m_isHookActive)
+			{
+				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				RaycastHit hit;
+				if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 8))
+				{
+					Debug.Log(hit.point);
+					m_hook = Instantiate(m_resourceManager.Hook, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Hook>();
+					m_hook.Init((hit.point - transform.position).normalized * HookHeadSpeed, HookLength);
+					m_fHookCooldown = HookCooldownMax;
+				}
+			}
+			if (Input.GetMouseButton(1) && m_isHookActive)
+			{
+				float step = HookSpeed * Time.deltaTime;
+				transform.position = Vector3.MoveTowards(transform.position, m_vHookCollisionPoint, step);
+				if(Vector3.Distance(transform.position, m_vHookCollisionPoint) < .5)
+				{
+					m_isHookActive = false;
+				}
+			}
+			if (Input.GetMouseButtonUp(1))
+			{
+				m_isHookActive = false;
+				if (m_hook != null)
+				{
+					m_hook.DestroySelf();
+					m_fHookCooldown = HookCooldownMax;
+				}
+			}
+		}
+
+		//DASH
+		if (m_fDashCooldown > 0) {
+			Debug.Log (m_fDashCooldown);
+			m_fDashCooldown -= Time.deltaTime;
+
+			// Shooting Cooldown
+			if (m_uiManager.DashCooldown.IsActive ()) {
+				m_uiManager.DashCooldown.GetComponentInChildren<Text> ().text = "" + (int)m_fDashCooldown;
+			} else {
+				m_uiManager.DashCooldown.gameObject.SetActive (true);
+			}
+		} else {
+			// Shooting Cooldown
+			m_uiManager.DashCooldown.gameObject.SetActive (false);
+		}
     }
 
     public void SetHookCollisionPoint(Vector3 pos)
@@ -209,12 +242,11 @@ public class Player : MonoBehaviour {
 		float moveHorizontal = Input.GetAxis("Horizontal");
 		Vector3 movement = new Vector3(moveHorizontal, 0.0f, 0.0f);
 
-		if (isDashing) 
-		{
+		if (isDashing) {
 			incrementalDegreesSinus += sinusUnits;
 			float cornerAngle = incrementalDegreesSinus * Mathf.PI / 180f;
 
-			m_rigidbody.AddForce(movement * dashBoost * Mathf.Sin(cornerAngle) * m_fSlowFactor, ForceMode.Impulse);
+			m_rigidbody.AddForce (movement * dashBoost * Mathf.Sin (cornerAngle) * m_fSlowFactor, ForceMode.Impulse);
 
 			if (incrementalDegreesSinus >= sinusMaxDegrees) {
 				isDashing = false;
@@ -222,9 +254,16 @@ public class Player : MonoBehaviour {
 			}
 		}
 
-		if (Input.GetKeyDown (KeyCode.LeftShift)) {
+		if (Input.GetKeyDown (KeyCode.LeftShift) && m_fDashCooldown <= 0) {
 			incrementalDegreesSinus = 0f;
 			isDashing = true;
+			numberOfDashes++;
+
+			if (numberOfDashes == maxDashes) 
+			{
+				m_fDashCooldown = m_fDashCooldownMax;
+				numberOfDashes = 0;
+			}
 		}
 	}
 

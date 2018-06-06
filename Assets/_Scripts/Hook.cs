@@ -31,7 +31,7 @@ public class Hook : MonoBehaviour {
                 Debug.Log("Destroyed hook because reached length");
                 DestroySelf();
             }
-            Debug.Log(transform.position);
+            // Debug.Log(transform.position);
         }
     }
 

@@ -25,6 +25,8 @@ public class UIManager : MonoBehaviour {
 	}
 	#endregion
 	public Image ShootingCooldown;
+	public Image HookCooldown;
+	public Image DashCooldown;
 	public Text HealthStats;
 	public Text EssenceStats;
 }
