@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        m_renderer = transform.GetComponent<Renderer>();
+        m_renderer = transform.GetComponentInChildren<SkinnedMeshRenderer>();
         m_rigidbody = transform.GetComponent<Rigidbody>();
         m_gameManager = GameManager.GetInstance();
         m_resourceManager = ResourceManager.GetInstance();
@@ -52,6 +52,21 @@ public class Enemy : MonoBehaviour
 
         Vector3 pos = m_player.transform.position;
         float dx = pos.x - transform.position.x;
+
+        if (dx < 0)
+        {
+            Quaternion rot = transform.rotation;
+            rot.y = 0;
+            transform.rotation = rot;
+        }
+
+        if (dx > 0)
+        {
+            Quaternion rot = transform.rotation;
+            rot.y = 180;
+            transform.rotation = rot;
+        }
+
         if ((transform.position - pos).magnitude > AggroRange && m_isAggro == false)
         {
             return;
@@ -85,7 +100,7 @@ public class Enemy : MonoBehaviour
                     //Debug.Log("Shooting");
                     //Debug.Log(hit.point);
                     Projectile proj = Instantiate(m_resourceManager.EnemyProjectile, transform.position, Quaternion.Euler(0, 0, 0)).GetComponent<Projectile>();
-                    proj.SetTarget(pos);
+					proj.SetTarget(pos);
                 }
             }
         }
