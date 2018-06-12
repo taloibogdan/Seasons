@@ -2321,7 +2321,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 400000, guid: 55b8fd30875a9c1468b645f10faf3be6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 60.38
+      value: 60.47
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 55b8fd30875a9c1468b645f10faf3be6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4333,6 +4333,7 @@ MonoBehaviour:
   Player: {fileID: 334779874}
   MinHeight: 1
   FollowDist: 1.1
+  WallLeft: {fileID: 667002297}
 --- !u!81 &395081055
 AudioListener:
   m_ObjectHideFlags: 0
@@ -8853,6 +8854,16 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114281041903510256, guid: f46e6f48b5b2cbc4cba18708132e4efd,
+        type: 2}
+      propertyPath: Range
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 114281041903510256, guid: f46e6f48b5b2cbc4cba18708132e4efd,
+        type: 2}
+      propertyPath: AggroRange
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f46e6f48b5b2cbc4cba18708132e4efd, type: 2}
   m_IsPrefabParent: 0
@@ -10037,6 +10048,16 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114350890725561804, guid: 29cf76db202aae546877002ee57841ad,
+        type: 2}
+      propertyPath: Range
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114350890725561804, guid: 29cf76db202aae546877002ee57841ad,
+        type: 2}
+      propertyPath: AggroRange
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 29cf76db202aae546877002ee57841ad, type: 2}
   m_IsPrefabParent: 0
@@ -10485,6 +10506,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 54750520152628186, guid: d1ec6d889f8cf8744a88426262b423a1,
+        type: 2}
+      propertyPath: m_Constraints
+      value: 120
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d1ec6d889f8cf8744a88426262b423a1, type: 2}
   m_IsPrefabParent: 0
@@ -10505,7 +10531,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4278977241045010, guid: a9c013005237dd84e91a06abc55a546b, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -0.8728051
+      value: -0.28
       objectReference: {fileID: 0}
     - target: {fileID: 4278977241045010, guid: a9c013005237dd84e91a06abc55a546b, type: 2}
       propertyPath: m_LocalRotation.x

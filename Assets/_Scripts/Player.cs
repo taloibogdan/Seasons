@@ -30,7 +30,7 @@ public class Player : MonoBehaviour {
     private float m_fInvinciBlinkLong = 0.2f;
     private float m_fInvinciBlinkShort = 0.1f;
 
-    private float m_fProjectileCooldownMax = 3;
+    private float m_fProjectileCooldownMax = 1.3f;
     private float m_fProjectileCooldown = -1;
 
     private float m_fSlowFactor = 1.0f;
@@ -192,6 +192,7 @@ public class Player : MonoBehaviour {
 
 			if (Input.GetMouseButtonDown(1) && m_fHookCooldown < 0 && !m_isHookActive)
 			{
+                Debug.Log("hitheredo");
 				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 				RaycastHit hit;
 				if (Physics.Raycast(ray, out hit, -GameManager.GetInstance().Camera.transform.position.z * 2, 1 << 8))
@@ -206,7 +207,7 @@ public class Player : MonoBehaviour {
 			{
 				float step = HookSpeed * Time.deltaTime;
 				transform.position = Vector3.MoveTowards(transform.position, m_vHookCollisionPoint, step);
-				if(Vector3.Distance(transform.position, m_vHookCollisionPoint) < .5)
+				if(Vector3.Distance(transform.position, m_vHookCollisionPoint) < .7)
 				{
 					m_isHookActive = false;
 				}

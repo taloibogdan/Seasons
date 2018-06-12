@@ -49,7 +49,7 @@ public class Hook : MonoBehaviour {
         {
             if(other.gameObject.tag.Contains("Player") == false)
             {
-                if (other.gameObject.layer != 8)
+                if (other.gameObject.layer != 8 && other.gameObject.layer != 10)
                 {
 
                     Debug.Log("Destroyed hook because hit something");

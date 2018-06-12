@@ -39,7 +39,7 @@ public class Boss : MonoBehaviour {
 
     private float m_fTeleportConsecutiveShots = 0;
     private float m_fTeleportConsecutiveShotsMax = 3;
-    private float m_fTeleportProjectileCooldownMax = 1;
+    private float m_fTeleportProjectileCooldownMax = 2;
     private float m_fTeleportProjectileCooldown = -1;
     private Vector3 positionBeforeTeleport = new Vector3(-100, -100, -100);
     private bool nextLeft = true;
@@ -203,7 +203,7 @@ public class Boss : MonoBehaviour {
                             m_fTeleportProjectileCooldown = m_fTeleportProjectileCooldownMax;
 
                             Vector3 newPosition = m_player.transform.position;
-                            int height = new System.Random().Next(3, 7);
+                            int height = new System.Random().Next(5, 8);
                             int direction = nextLeft ? -1 : 1;
 
                             newPosition.x += direction * 3;

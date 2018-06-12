@@ -114,7 +114,9 @@ MonoBehaviour:
   IsPlayerProjectile: 1
   Speed: 8
   IsFollowingPlayer: 0
-  Lifetime: 1
+  Lifetime: 2
+  DoesDamage: 1
+  HasSlow: 0
 --- !u!135 &135814901019433118
 SphereCollider:
   m_ObjectHideFlags: 1
